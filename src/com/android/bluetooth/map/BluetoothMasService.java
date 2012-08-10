@@ -630,7 +630,6 @@ public class BluetoothMasService extends Service {
         private SocketAcceptThread mAcceptThread = null;
         private BluetoothSocket mConnSocket = null;
         private ServerSession mServerSession = null;
-        private PowerManager.WakeLock mWakeLock = null;
         private BluetoothMasObexServer mMapServer = null;
 
         private int mSupportedMessageTypes;
@@ -714,17 +713,6 @@ public class BluetoothMasService extends Service {
         public void closeConnection() {
             if (VERBOSE) Log.v(TAG, "Mas connection closing");
 
-            // Release the wake lock if obex transaction is over
-            if (mWakeLock != null) {
-                if (mWakeLock.isHeld()) {
-                    if (VERBOSE) Log.v(TAG,"Release full wake lock");
-                    mWakeLock.release();
-                    mWakeLock = null;
-                } else {
-                    mWakeLock = null;
-                }
-            }
-
             if (mAcceptThread != null) {
                 try {
                     mAcceptThread.shutdown();
@@ -754,17 +742,6 @@ public class BluetoothMasService extends Service {
             if (VERBOSE)
                 Log.v(TAG, "Map Service startObexServerSession ");
 
-            // acquire the wakeLock before start Obex transaction thread
-            if (mWakeLock == null) {
-                PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-                mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                        "StartingObexMapTransaction");
-                mWakeLock.setReferenceCounted(false);
-            }
-            if(!mWakeLock.isHeld()) {
-                if (VERBOSE) Log.v(TAG,"Acquire partial wake lock");
-                mWakeLock.acquire();
-            }
             Context context = getApplicationContext();
 
             IBluetoothMasApp appIf = null;
