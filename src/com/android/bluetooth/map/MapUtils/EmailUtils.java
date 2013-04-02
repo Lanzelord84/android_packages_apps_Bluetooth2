@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2012, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2010-2013, The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -166,6 +166,26 @@ public class EmailUtils {
             cr.close();
         }
         return msgSize;
+    }
+
+    public static int getAttachmentSizeEmail(long messageId, Context context) {
+        if (V){
+            Log.v(TAG, ":: Message Id in getAttachmentSizeEmail ::"+ messageId);
+        }
+        int attchSize = 0;
+        Uri uri = Uri.parse("content://com.android.email.provider/attachment");
+
+        Cursor cr = context.getContentResolver().query(
+                uri, new String[]{"size"}, "messageKey = "+ messageId , null, null);
+        if (cr != null && cr.moveToFirst()) {
+            do {
+                attchSize += cr.getInt(0);
+            } while (cr.moveToNext());
+        }
+        if (cr != null) {
+            cr.close();
+        }
+        return attchSize;
     }
 
     public static String getFolderName(String[] splitStringsEmail) {
@@ -479,7 +499,7 @@ public class EmailUtils {
         }
 
         if ((appParams.ParameterMask & BIT_ATTACHMENT_SIZE) != 0) {
-            emailMsg.setAttachment_size(0);
+            emailMsg.setAttachment_size(getAttachmentSizeEmail(Long.valueOf(msgId), context));
         }
 
         if ((appParams.ParameterMask & BIT_PRIORITY) != 0) {
