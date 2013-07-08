@@ -7,7 +7,8 @@ LOCAL_MODULE_TAGS := optional
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_PACKAGE_NAME := Bluetooth
+LOCAL_PACKAGE_NAME := Bluetooth2
+LOCAL_OVERRIDES_PACKAGES := Bluetooth
 
 LOCAL_JAVA_LIBRARIES := javax.btobex
 LOCAL_JAVA_LIBRARIES += mms-common
